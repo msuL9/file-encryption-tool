@@ -18,5 +18,3 @@ A secure AES-256 file encryption/decryption tool using Python and cryptography l
 ## Contributions
 - Implemented AES-256 CBC mode encryption.
 - Added secure key derivation and padding.
-
-![Demo](demo.gif)
