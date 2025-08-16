@@ -1,75 +1,109 @@
-# Import necessary modules: os for file operations, cryptography for encryption tools, base64 (not used here but imported for potential future expansion).
 import os
-from cryptography.hazmat.primitives import hashes  # For hashing algorithms.
-from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC  # For key derivation.
-from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes  # For AES encryption.
-from cryptography.hazmat.backends import default_backend  # Default backend for crypto operations.
-import base64  # Optional, for encoding if needed later.
+from cryptography.hazmat.primitives import hashes
+from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
+from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
+from cryptography.hazmat.backends import default_backend
+import base64
+import sys  # Added for flush
 
-# Function to derive a secure key from password and salt using PBKDF2.
-# Step: This makes weak passwords stronger by hashing repeatedly.
 def derive_key(password: str, salt: bytes) -> bytes:
+    print("Debug: Deriving key...")
+    sys.stdout.flush()
     kdf = PBKDF2HMAC(
-        algorithm=hashes.SHA256(),  # Use SHA-256 hash.
-        length=32,  # 256-bit key for AES-256.
-        salt=salt,  # Random salt to prevent rainbow table attacks.
-        iterations=100000,  # High iterations for security (slows brute-force).
-        backend=default_backend()  # Use default crypto backend.
+        algorithm=hashes.SHA256(),
+        length=32,
+        salt=salt,
+        iterations=100000,
+        backend=default_backend()
     )
-    return kdf.derive(password.encode())  # Derive and return the key.
+    key = kdf.derive(password.encode())
+    print("Debug: Key derived.")
+    sys.stdout.flush()
+    return key
 
-# Function to encrypt a file.
-# Step: Generate salt and IV, encrypt chunks of the file, write to output.
 def encrypt_file(input_file: str, output_file: str, password: str):
-    salt = os.urandom(16)  # Generate 16-byte random salt.
-    key = derive_key(password, salt)  # Derive key from password and salt.
-    iv = os.urandom(16)  # Generate 16-byte random initialization vector for CBC mode.
-    cipher = Cipher(algorithms.AES(key), modes.CBC(iv), backend=default_backend())  # Set up AES-CBC cipher.
-    encryptor = cipher.encryptor()  # Create encryptor object.
+    print("Debug: Generating salt...")
+    sys.stdout.flush()
+    salt = os.urandom(16)
+    print("Debug: Salt generated.")
+    sys.stdout.flush()
+    key = derive_key(password, salt)
+    print("Debug: Generating IV...")
+    sys.stdout.flush()
+    iv = os.urandom(16)
+    print("Debug: IV generated.")
+    sys.stdout.flush()
+    print("Debug: Creating cipher...")
+    sys.stdout.flush()
+    cipher = Cipher(algorithms.AES(key), modes.CBC(iv), backend=default_backend())
+    print("Debug: Cipher created.")
+    sys.stdout.flush()
+    encryptor = cipher.encryptor()
+    print("Debug: Encryptor ready.")
+    sys.stdout.flush()
     
-    # Open input file for reading (binary), output for writing (binary).
+    print("Debug: Opening files...")
+    sys.stdout.flush()
     with open(input_file, 'rb') as f_in, open(output_file, 'wb') as f_out:
-        f_out.write(salt + iv)  # Write salt and IV to output file (needed for decryption).
-        while chunk := f_in.read(1024 * 1024):  # Read file in 1MB chunks to handle large files.
-            # Pad chunk if not multiple of 16 bytes (AES block size).
+        print("Debug: Files opened.")
+        sys.stdout.flush()
+        print("Debug: Writing salt and IV...")
+        sys.stdout.flush()
+        f_out.write(salt + iv)
+        print("Debug: Salt and IV written.")
+        sys.stdout.flush()
+        print("Debug: Starting encryption loop...")
+        sys.stdout.flush()
+        chunk_count = 0
+        while chunk := f_in.read(1024 * 1024):
+            chunk_count += 1
+            print(f"Debug: Processing chunk {chunk_count} (size: {len(chunk)} bytes)...")
+            sys.stdout.flush()
             padded_chunk = chunk + b'\0' * (16 - len(chunk) % 16) if len(chunk) % 16 != 0 else chunk
-            f_out.write(encryptor.update(padded_chunk))  # Encrypt and write chunk.
-        f_out.write(encryptor.finalize())  # Finalize encryption (handles any remaining data).
-    print(f"File encrypted: {output_file}")  # Print success message.
+            f_out.write(encryptor.update(padded_chunk))
+            print(f"Debug: Chunk {chunk_count} encrypted.")
+            sys.stdout.flush()
+        print("Debug: Encryption loop finished.")
+        sys.stdout.flush()
+        print("Debug: Finalizing encryption...")
+        sys.stdout.flush()
+        f_out.write(encryptor.finalize())
+        print("Debug: Encryption finalized.")
+        sys.stdout.flush()
+    print(f"File encrypted: {output_file}")
+    sys.stdout.flush()
 
-# Function to decrypt a file.
-# Step: Read salt and IV from file, decrypt chunks, remove padding.
 def decrypt_file(input_file: str, output_file: str, password: str):
-    with open(input_file, 'rb') as f_in:  # Open encrypted file for reading.
-        salt = f_in.read(16)  # Read stored salt.
-        iv = f_in.read(16)  # Read stored IV.
-        key = derive_key(password, salt)  # Derive key using same password and salt.
-        cipher = Cipher(algorithms.AES(key), modes.CBC(iv), backend=default_backend())  # Set up decryptor.
-        decryptor = cipher.decryptor()  # Create decryptor object.
+    with open(input_file, 'rb') as f_in:
+        salt = f_in.read(16)
+        iv = f_in.read(16)
+        key = derive_key(password, salt)
+        cipher = Cipher(algorithms.AES(key), modes.CBC(iv), backend=default_backend())
+        decryptor = cipher.decryptor()
         
-        with open(output_file, 'wb') as f_out:  # Open output for writing.
-            while chunk := f_in.read(1024 * 1024):  # Read in 1MB chunks.
-                decrypted = decryptor.update(chunk)  # Decrypt chunk.
-                f_out.write(decrypted)  # Write decrypted data.
-            # Finalize and remove padding (null bytes).
+        with open(output_file, 'wb') as f_out:
+            while chunk := f_in.read(1024 * 1024):
+                decrypted = decryptor.update(chunk)
+                f_out.write(decrypted)
             f_out.write(decryptor.finalize().rstrip(b'\0'))
-    print(f"File decrypted: {output_file}")  # Print success message.
+    print(f"File decrypted: {output_file}")
+    sys.stdout.flush()
 
-# Main script entry point.
 if __name__ == "__main__":
-    import sys  # Import sys for command-line arguments.
-    # Check if enough arguments are provided.
     if len(sys.argv) < 4:
         print("Usage: python file_encryptor.py [encrypt/decrypt] input_file output_file")
-        sys.exit(1)  # Exit if invalid.
+        sys.stdout.flush()
+        sys.exit(1)
     
-    mode, input_file, output_file = sys.argv[1:4]  # Parse arguments.
-    password = input("Enter password: ")  # Prompt for password (hidden in some terminals).
+    mode, input_file, output_file = sys.argv[1:4]
+    password = input("Enter password: ")
+    print("Debug: Password entered, starting operation...")
+    sys.stdout.flush()
     
-    # Run encrypt or decrypt based on mode.
     if mode == "encrypt":
         encrypt_file(input_file, output_file, password)
     elif mode == "decrypt":
         decrypt_file(input_file, output_file, password)
     else:
         print("Invalid mode. Use 'encrypt' or 'decrypt'.")
+        sys.stdout.flush()
