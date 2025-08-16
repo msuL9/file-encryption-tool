@@ -2,14 +2,21 @@
 
 ![Demo](demo.gif)
 
-A secure file encryption tool using AES-256 and PBKDF2 in Python.
+A secure AES-256 file encryption/decryption tool using Python and cryptography library.
+
+## Features
+- Encrypt/decrypt files with password-derived keys (PBKDF2).
+- Handles large files in chunks.
+
+## Installation
+1. Install dependencies: `pip install -r requirements.txt`
 
 ## Usage
-- Encrypt: `python file_encryptor.py encrypt input.txt output.enc`
-- Decrypt: `python file_encryptor.py decrypt output.enc decrypted.txt`
-
-Enter password when prompted.
+1. Encrypt: `python file_encryptor.py encrypt input.txt output.enc` (enter password).
+2. Decrypt: `python file_encryptor.py decrypt output.enc decrypted.txt` (enter password).
 
 ## Contributions
-- Implemented core encryption/decryption logic.
-- Added key derivation for security.
+- Implemented AES-256 CBC mode encryption.
+- Added secure key derivation and padding.
+
+![Demo](demo.gif)
