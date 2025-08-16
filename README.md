@@ -1,5 +1,7 @@
 # file-encryption-tool
 
+![Demo](demo.gif)
+
 A secure file encryption tool using AES-256 and PBKDF2 in Python.
 
 ## Usage
