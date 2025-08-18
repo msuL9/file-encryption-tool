@@ -1,4 +1,5 @@
 import pytest
+from cryptography.exceptions import InvalidSignature
 from encryptor.crypto import encrypt, decrypt
 
 def test_encrypt_decrypt():
@@ -11,5 +12,5 @@ def test_encrypt_decrypt():
     decrypted = decrypt(ciphertext, key, iv, mac)
     assert decrypted == data
 
-    with pytest.raises(ValueError):
-        decrypt(ciphertext + b'\x00', key, iv, mac)  # Tampered ciphertext
+    with pytest.raises(InvalidSignature):
+        decrypt(ciphertext + b'\x00', key, iv, mac)

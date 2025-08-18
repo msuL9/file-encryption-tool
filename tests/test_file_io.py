@@ -1,4 +1,5 @@
 import pytest
+from cryptography.exceptions import InvalidSignature
 import os
 from encryptor.file_io import encrypt_file, decrypt_file
 
@@ -19,5 +20,5 @@ def test_encrypt_decrypt_file(tmp_path):
     with open(decrypted_file, 'rb') as f:
         assert f.read() == b"test content"
 
-    with pytest.raises(ValueError):
+    with pytest.raises(InvalidSignature):
         decrypt_file(str(encrypted_file), str(decrypted_file), "wrongpass")
