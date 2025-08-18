@@ -1,5 +1,7 @@
 # file-encryption-tool
 
+![Demo](demo.gif)
+
 ## Overview
 This project is a command-line tool for encrypting and decrypting files using AES-256 in CBC mode, with PBKDF2 for key derivation from a password. It includes HMAC for integrity verification and PKCS7 padding. Built with modularity (separate modules for key derivation, crypto operations, and file I/O), it uses the `cryptography` library. Includes unit tests with 100% coverage via `pytest` and `coverage`.
 
