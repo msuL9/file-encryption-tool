@@ -2,24 +2,26 @@
 
 ![Demo](demo.gif)
 
+# file-encryption-tool
+
 ## Overview
-This project is a command-line tool for encrypting and decrypting files using AES-256 in CBC mode, with PBKDF2 for key derivation from a password. It includes HMAC for integrity verification and PKCS7 padding. Built with modularity (separate modules for key derivation, crypto operations, and file I/O), it uses the `cryptography` library. Includes unit tests with 100% coverage via `pytest` and `coverage`.
+A command-line tool for encrypting and decrypting files using AES-256 in CBC mode, with PBKDF2 for password-based key derivation. Includes HMAC for integrity and PKCS7 padding. Modular design with full unit tests achieving 100% coverage.
 
 ## Features
-- Secure encryption/decryption with password-based key.
-- Integrity checks to detect tampering.
-- CLI interface for ease of use.
+- Password-based encryption/decryption with AES-256.
+- Integrity verification via HMAC to detect tampering.
+- User-friendly CLI with error handling (e.g., "Invalid Password" message).
 
 ## Requirements
 - Python 3.13.6
-- Dependencies (from `requirements.txt`):
+- Dependencies (in `requirements.txt`):
   ```
   cryptography==43.0.3
   pytest==8.3.3
   coverage==7.6.1
   ```
 
-## Installation
+## Setup
 1. Clone the repository:
    ```
    git clone <repo-url>
@@ -51,10 +53,6 @@ coverage combine
 coverage report -m
 ```
 
-## Project Structure
-- `encryptor/`: Core modules (`key.py`, `crypto.py`, `file_io.py`).
-- `main.py`: CLI entry point.
-- `tests/`: Unit tests.
-- `.coveragerc`: Coverage config.
+## License
 
-Deactivate venv: `deactivate`
+MIT License. See [LICENSE](LICENSE) for details.
