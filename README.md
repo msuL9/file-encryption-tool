@@ -10,7 +10,6 @@ A command-line tool for encrypting and decrypting files using AES-256 in CBC mod
 ## Features
 - Password-based encryption/decryption with AES-256.
 - Integrity verification via HMAC to detect tampering.
-- User-friendly CLI with error handling (e.g., "Invalid Password" message).
 
 ## Requirements
 - Python 3.13.6
