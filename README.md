@@ -5,7 +5,7 @@
 # file-encryption-tool
 
 ## Overview
-A command-line tool for encrypting and decrypting files using AES-256 in CBC mode, with PBKDF2 for password-based key derivation. Includes HMAC for integrity and PKCS7 padding. Modular design with full unit tests achieving 100% coverage.
+This is a command-line tool for encrypting and decrypting files using AES-256 in CBC mode, with PBKDF2 for password-based key derivation. Includes HMAC for integrity and PKCS7 padding. Modular design with full unit tests achieving 100% coverage.
 
 ## Features
 - Password-based encryption/decryption with AES-256.
